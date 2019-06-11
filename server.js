@@ -1,12 +1,17 @@
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 8080;
+var webpack = require('webpack');
+var config = require('./webpack.prod.config');
+const compiler = webpack(config);
 const app = express();
 
-// the __dirname is the current directory from where the script is running
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
+    publicPath: config.output.publicPath
+}));
 
-// send the user to index html page inspite of the url
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
