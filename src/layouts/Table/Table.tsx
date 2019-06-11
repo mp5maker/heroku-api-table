@@ -60,7 +60,24 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
     performFiltering(type: string): void {
         const { filter } = this.props
         const { filtering } = this.state
-        const { params } = this.props.match
+        const { params, path } = this.props.match
+        const isAll = (path == "/all/:sort?/:order?");
+
+        if (!isAll) {
+            const route = `/${type}/${filtering[type] == 'asc' ? 'desc' : 'asc'}/${isValidRoute({ ...params, check: 'page' }) ? params.page : 1}/`
+            this.props.history.push(route)
+        }
+
+        if (isAll) {
+            const route = `/all/${type}/${filtering[type] == 'asc' ? 'desc' : 'asc'}/`
+            this.props.history.push(route)
+        }
+
+        this.props.FilterAction({
+            ...filter,
+            sort: type,
+            order: filtering[type] == 'asc' ? 'desc' : 'asc'
+        })
 
         this.setState({
             filtering: {
@@ -68,17 +85,10 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
                 [type]: filtering[type] == 'asc' ? 'desc' : 'asc'
             }
         })
-        this.props.FilterAction({
-            ...filter,
-            sort: type,
-            order: filtering[type] == 'asc' ? 'desc' : 'asc'
-        })
-        const route = `/${type}/${filtering[type] == 'asc' ? 'desc' : 'asc'}/${isValidRoute({...params, check: 'page' }) ? params.page : 1}/`
-        this.props.history.push(route)
     }
 
-    onClickSortOrder({event, tableHeadName}: any) {
-        switch(tableHeadName) {
+    onClickSortOrder({ event, tableHeadName }: any) {
+        switch (tableHeadName) {
             case ID:
                 return this.performFiltering(ID)
             case NAME:
@@ -93,8 +103,8 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
         }
     }
 
-    onClickTableRow({event, selected}: any): void {
-        this.props.GetSelectedItem({selected})
+    onClickTableRow({ event, selected }: any): void {
+        this.props.GetSelectedItem({ selected })
         localStorage.setItem('selected', JSON.stringify(selected))
         this.setState({ selected })
     }
@@ -103,7 +113,7 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
         if (event.target.closest('.navbar')) {
             this.props.GetSelectedItem({ selected: "" })
             localStorage.setItem('selected', JSON.stringify({}))
-            this.setState({ selected: {}})
+            this.setState({ selected: {} })
         }
     }
 
@@ -144,15 +154,15 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
                                 tableHead.map((perTableHead, index) => (
                                     <th key={index}>
                                         <span onClick={(event) => this.onClickSortOrder({ event, tableHeadName: tableHead[index] })}>
-                                            { tableHeadReadableName[index] } &nbsp;
+                                            {tableHeadReadableName[index]} &nbsp;
                                             {
                                                 filtering[tableHead[index]] == 'asc' ?
-                                                <small>
-                                                    <i className="fas fa-arrow-up"></i>
-                                                </small> :
-                                                <small>
-                                                    <i className="fas fa-arrow-down"></i>
-                                                </small>
+                                                    <small>
+                                                        <i className="fas fa-arrow-up"></i>
+                                                    </small> :
+                                                    <small>
+                                                        <i className="fas fa-arrow-down"></i>
+                                                    </small>
                                             }
                                         </span>
                                     </th>
@@ -165,13 +175,13 @@ class Table extends React.Component<TablePropsInterface, TableStateInterface> {
                             tableData.map((perRow) => {
                                 return (
                                     <tr
-                                        onClick={(event) => this.onClickTableRow({event, selected: perRow})}
+                                        onClick={(event) => this.onClickTableRow({ event, selected: perRow })}
                                         key={perRow.id}
                                         className={`table-data-${perRow.id} ${selected.id == perRow.id && hasSelectedItem ? 'active' : ''}`}>
                                         {
                                             Object.keys(perRow).map((perColumn, perColumnKey) => (
-                                                <td key={perColumnKey} className={`${perColumn}`}>
-                                                    { DateTimeConversion(perRow[perColumn]) }
+                                                <td key={perColumnKey} className={`${perColumn}`} data-head={Capitalize(perColumn)}>
+                                                    {DateTimeConversion(perRow[perColumn])}
                                                 </td>
                                             ))
                                         }

@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 
 // @ts-ignore
-import { GET_POST_SUCCESS, GET_POST_ERROR }  from "ReduxConstants/ActionType";
+import { GET_POST_SUCCESS, GET_POST_ERROR } from "ReduxConstants/ActionType";
 
 // @ts-ignore
 import { ApiHelper } from "Api/ApiHelper"
@@ -70,6 +70,6 @@ export const GetPostAction = (params: any = {}) => (dispatch: Dispatch<any>) => 
     if (Object.keys(params).length > 0) {
         ApiHelper.posts(params).then(onSuccess).catch(onError);
     } else {
-        ApiHelper.posts({_sort: 'id', _order: 'asc'}).then(onSuccess).catch(onError);
+        ApiHelper.posts({ _sort: 'id', _order: 'asc' }).then(onSuccess).catch(onError);
     }
 }
