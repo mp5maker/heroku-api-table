@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "postinstall": "tsc",
     "heroku-prebuild": "npm install --dev",
     "heroku-postbuild": "webpack --mode production",
     "build": "webpack --mode production",
@@ -83,6 +84,6 @@
     "redux-thunk": "^2.3.0"
   },
   "engines": {
-    "node": "8.11.4"
+    "node": "10.5.0"
   }
 }
