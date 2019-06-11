@@ -74,7 +74,7 @@ class App extends React.Component<AppPropsInterface, AppStateInterface> {
         this.setState({ showAll: !this.state.showAll })
     }
 
-    onClickPagination({ event, page }: any) {
+    onClickPagination({event, page}: any) {
         const { sort, order, pageSize } = this.props.filter
         const params = { _page: page, _limit: pageSize, _sort: sort, _order: order };
         this.props.GetPostAction(params);
@@ -90,16 +90,16 @@ class App extends React.Component<AppPropsInterface, AppStateInterface> {
 
         if (isAll) {
             this.props.history.push("/all/id/asc");
-            this.props.GetPostAction({ _sort: "id", _all: true, _order: "asc" });
+            this.props.GetPostAction({_sort: "id", _all: true, _order: "asc"});
             this.setState({ showAll: !this.state.showAll });
         }
 
         if (!isAll) {
             const params = {
-                _page: isValidRoute({ ...match.params, check: 'page' }) ? match.params.page : currentPage,
+                _page: isValidRoute({...match.params, check: 'page'}) ? match.params.page : currentPage,
                 _limit: pageSize,
-                _sort: isValidRoute({ ...match.params, check: 'sort' }) ? match.params.sort : sort,
-                _order: isValidRoute({ ...match.params, check: 'order' }) ? match.params.order : order
+                _sort: isValidRoute({...match.params, check: 'sort'}) ? match.params.sort : sort,
+                _order: isValidRoute({...match.params, check: 'order'}) ? match.params.order : order
             }
             this.props.GetPostAction(params)
         }
@@ -113,7 +113,7 @@ class App extends React.Component<AppPropsInterface, AppStateInterface> {
             const { sort, order, pageSize } = this.props.filter
             const { page } = this.props.match.params
 
-            if (isAll) {
+            if(isAll) {
                 const params = {
                     _sort: sort,
                     _order: order,
@@ -138,15 +138,20 @@ class App extends React.Component<AppPropsInterface, AppStateInterface> {
 
     render() {
         const { posts, selected } = this.props
-        const { loading } = posts
+        const { pageSize } = this.props.filter
+        const { loading, data } = posts
+        const { showAll } = this.state
+
         const tableHead = this.props.posts ? this.props.posts.data ? this.props.posts.data.data ? Object.keys(this.props.posts.data.data[0]) : [] : [] : [];
         const tableData = this.props.posts ? this.props.posts.data ? this.props.posts.data.data ? this.props.posts.data.data : [] : [] : [];
+
         const hasSelectedItem = Object.keys(selected.selected).length > 0 ? true : false;
-        const { data } = posts
-        const hasData = data ? Object.keys(data).length > 0 ? true : false : false;
+        const hasData = data ? Object.keys(data).length > 0 ? true : false: false;
+
         const { previous, next, previous_page_number, next_page_number, current, total, count } = data
-        const { showAll } = this.state
+        const maxPageNumber = Math.floor(total/pageSize)
         const pageNumberArray = current ? [current, current + 1, current + 2] : [1, 2, 3];
+
 
         if (loading) return <Loading />
         return (
@@ -159,57 +164,62 @@ class App extends React.Component<AppPropsInterface, AppStateInterface> {
                                 <div className="selected-item">
                                     {
                                         hasSelectedItem ?
-                                            <PersonInfo selected={selected} />
-                                            : <div>You did not select any item</div>
+                                        <PersonInfo selected={selected}/>
+                                        : <div>You did not select any item</div>
                                     }
                                 </div>
                                 <div className="pagination-container">
                                     <ul className={`pagination`}>
                                         {
                                             previous && hasData ?
-                                                <li
-                                                    className={`page-item  ${showAll ? 'd-none' : ''}`}
-                                                    onClick={(event) => this.onClickPagination({ event, page: previous_page_number ? previous_page_number : 0 })}>
-                                                    <a className="page-link">
-                                                        Previous
+                                            <li
+                                                className={`page-item  ${showAll ? 'd-none' : ''}`}
+                                                onClick={(event) => this.onClickPagination({ event, page: previous_page_number ? previous_page_number : 0 })}>
+                                                <a className="page-link">
+                                                    Previous
                                                 </a>
-                                                </li> :
-                                                <li className={`page-item disabled ${showAll ? 'd-none' : ''}`}>
-                                                    <a className="page-link">
-                                                        Previous
+                                            </li> :
+                                            <li className={`page-item disabled ${showAll ? 'd-none' : ''}`}>
+                                                <a className="page-link">
+                                                    Previous
                                                 </a>
-                                                </li>
+                                            </li>
                                         }
                                         {
-                                            pageNumberArray.map((perPage, index) => (
-                                                <li
-                                                    className={`page-item ${index == 0 ? "active" : ""} ${showAll ? 'd-none' : ''}`}
-                                                    key={index}
-                                                    onClick={(event) => this.onClickPagination({ event, page: perPage ? perPage : 0 })}>
-                                                    <a className="page-link">
-                                                        {perPage}
-                                                    </a>
-                                                </li>
-                                            ))
+                                            pageNumberArray.map((perPage, index) => {
+                                                {
+                                                    return perPage > maxPageNumber ? <React.Fragment key={index}></React.Fragment>
+                                                    :
+                                                    <li
+                                                        className={`page-item ${index == 0 ? "active" : ""} ${showAll ? 'd-none' : ''}`}
+                                                        key={index}
+                                                        onClick={(event) => this.onClickPagination({ event, page: perPage ? perPage : 0 })}>
+                                                        <a className="page-link">
+                                                            { perPage }
+                                                        </a>
+                                                    </li>
+                                                }
+
+                                            })
                                         }
                                         {
                                             next && hasData ?
-                                                <li
-                                                    className={`page-item ${showAll ? 'd-none' : ''}`}
-                                                    onClick={(event) => this.onClickPagination({ event, page: next_page_number ? next_page_number : 0 })}>
-                                                    <a className="page-link">
-                                                        Next
+                                            <li
+                                                className={`page-item ${showAll ? 'd-none' : ''}`}
+                                                onClick={(event) => this.onClickPagination({ event, page: next_page_number ? next_page_number : 0 })}>
+                                                <a className="page-link">
+                                                    Next
                                                 </a>
-                                                </li> : <React.Fragment></React.Fragment>
+                                            </li> : <React.Fragment></React.Fragment>
                                         }
                                         <li className="page-item" onClick={this.onClickShowAll}>
                                             <a className="page-link">
-                                                {showAll ? 'Pagination' : 'Scrolling'}
+                                                {showAll ? 'Pagination' : 'Scrolling' }
                                             </a>
                                         </li>
                                         <li className="page-item">
                                             <a className="page-link">
-                                                {count ? count : 0} / {total ? total : 0}
+                                                { count ? count > total ? total : count : 0 } / { total ? total : 0 }
                                             </a>
                                         </li>
                                     </ul>
