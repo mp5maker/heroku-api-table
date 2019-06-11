@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "heroku-prebuild": "npm install --dev",
-    "heroku-postbuild": "webpack --mode development",
+    "heroku-postbuild": "webpack --mode production",
     "build": "webpack --mode production",
     "dev": "webpack-dev-server --open --mode-development",
     "analyzer": "webpack --mode production --analyzer",
